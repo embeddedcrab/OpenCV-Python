@@ -1,0 +1,46 @@
+
+import cv2
+import numpy as np
+import datetime
+
+Capture = cv2.VideoCapture(0)
+
+color = np.uint8([[[255, 0, 0]]])
+hsv_color = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)
+print hsv_color
+hsv_colorx = hsv_color.item(0)
+hsv_colory = hsv_color.item(1)
+hsv_colorz = hsv_color.item(2)
+print hsv_colorx, hsv_colory, hsv_colorz
+
+threshold = 0.2
+
+while(Capture.isOpened()):
+    success, Image = Capture.read()
+
+    if success != True:
+        print 'No Frames'
+        break
+
+    hsv_Image = cv2.cvtColor(Image, cv2.COLOR_BGR2HSV)
+
+    lower_color = np.array([(hsv_colorx-(threshold*hsv_colorx)), (hsv_colory-(threshold*hsv_colory)), (hsv_colorz-(threshold*hsv_colorz))])
+    upper_color = np.array([(hsv_colorx+(threshold*hsv_colorx)), (hsv_colory+(threshold*hsv_colory)), (hsv_colorz+(threshold*hsv_colorz))])
+
+    #thresholding Images for color color
+    mask = cv2.inRange(hsv_Image, lower_color, upper_color)
+
+    #Bitwise AND masking to find Red color in Image
+    Anding = cv2.bitwise_and(Image, Image, mask = mask)
+
+    cv2.imshow('VideoFrames',Image)
+    #cv2.imshow('mask',mask)
+    cv2.imshow('Anding', Anding)
+    key = (cv2.waitKey(1) & 0xFF)
+    if key == ord("q"):
+        print 'Switching OFF..!!'
+        break
+
+Capture.release()
+cv2.destroyAllWindows()
+
